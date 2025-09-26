@@ -1,18 +1,27 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; 
 
-function Register() {
-  const [email, setEmail] = useState(' ');
-  const [password, setPassword] = useState(' ');
+export default function Register() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Register email:", email, "password:" , password});
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    console.log("Register email:", email, "password:", password);
   };
 
-  return {
+  return (
     <div>
       <h2>Register</h2>
-      <form onSubmit={handleRegister)>
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
           placeholder="Enter email"
@@ -27,7 +36,7 @@ function Register() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <input 
+        <input
           type="password"
           placeholder="Enter to confirm password"
           value={confirmPassword}
@@ -36,13 +45,11 @@ function Register() {
         />
         <button type="submit">Register</button>
       </form>
+
       <p className="switch-text">
-          Already have an account?
-          <Link to="/" className="switch-link">
-              Login here
-          </Link>
+        Already have an account?
+        <Link to="/" className="switch-link"> Login here</Link>
       </p>
     </div>
   );
-};
-export default Register;
+}

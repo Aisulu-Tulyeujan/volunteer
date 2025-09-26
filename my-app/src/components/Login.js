@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
-function LoginForm() {
-  const [email, setEmail] = useState(' ');
-  const [password, setPassword] = useState(' ');
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log("Logging in with:",  email, password );
+    console.log("Logging in with:", email, password);
   };
 
-  return {
+  return (
     <div>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit)>
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
           placeholder="Enter email"
@@ -31,15 +30,11 @@ function LoginForm() {
         />
         <button type="submit">Submit</button>
       </form>
+
       <p className="switch-text">
         Don't have an account?
-        <Link to="/register" className="switch-link">
-          Register here
-        </Link>
+        <Link to="/register" className="switch-link"> Register here</Link>
       </p>
     </div>
   );
-};
-export default Login;
-          
-                                  
+}

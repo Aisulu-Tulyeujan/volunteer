@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 
 function LoginForm() {
   const [email, setEmail] = useState(' ');
@@ -7,7 +8,7 @@ function LoginForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("Logging in with:", { email, password });
+    console.log("Logging in with:",  email, password );
   };
 
   return {
@@ -30,6 +31,12 @@ function LoginForm() {
         />
         <button type="submit">Submit</button>
       </form>
+      <p className="switch-text">
+        Don't have an account?
+        <Link to="/register" className="switch-link">
+          Register here
+        </Link>
+      </p>
     </div>
   );
 };

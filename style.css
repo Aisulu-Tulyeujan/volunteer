@@ -1,1 +1,49 @@
 
+.App {
+  font-family: Arial, sans-serif:
+  text-align: center;
+  margin: 30px auto;
+  width: 400px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #ECBDC4;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+input {
+  padding: 10px;
+  width: 100%
+  box-sizing: border-box;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+button[type="submit"] {
+  padding: 10px;
+  background-color: #ffd700;
+  color: #333;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.switch-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+.switch-link {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 5px;
+}

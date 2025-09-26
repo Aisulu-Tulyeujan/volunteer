@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Logging in with:", email, password);
+    navigate("/dashboard", { replace: true });
   };
 
   return (
-    <div>
+    <div className="auth-page">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <input

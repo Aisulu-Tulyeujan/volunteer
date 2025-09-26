@@ -19,7 +19,7 @@ export default function Register() {
   };
 
   return (
-    <div>
+    <div className="auth-page">
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <input

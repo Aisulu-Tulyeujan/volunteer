@@ -1,5 +1,5 @@
 
-.App {
+.auth-page {
   font-family: Arial, sans-serif;
   text-align: center;
   margin: 30px auto;
@@ -10,14 +10,14 @@
   background-color: #ECBDC4;
 }
 
-form {
+.auth-page form {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px;
 }
 
-input {
+.auth-page input {
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
@@ -26,7 +26,7 @@ input {
   border-radius: 3px;
 }
 
-button[type="submit"] {
+.auth-page button[type="submit"] {
   padding: 10px;
   background-color: #ffd700;
   color: #333;
@@ -35,15 +35,39 @@ button[type="submit"] {
   cursor: pointer;
   margin-top: 10px;
 }
-.switch-text {
+.auth-page .switch-text {
   margin-top: 20px;
   font-size: 14px;
   color: #555;
 }
-.switch-link {
+.auth-page .switch-link {
   color: #007bff;
   font-weight: bold;
   cursor: pointer;
   text-decoration: underline;
   margin-left: 5px;
+}
+
+.admin { 
+    display: grid; 
+    grid-template-columns: 240px 1fr; 
+    gap: 16px; 
+    margin-top: 16px; 
+}
+.sidebar { 
+    border: 1px solid #e5e7eb; 
+    border-radius: 10px; 
+    padding: 16px; 
+    background: #fff; 
+}
+.content { 
+    display: grid; 
+    gap: 16px; }
+
+.card { 
+    background: #fff; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 10px; 
+    padding: 16px; 
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03); 
 }

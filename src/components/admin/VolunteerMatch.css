@@ -1,0 +1,78 @@
+.volunteer-match {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.volunteer-match header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.volunteer-match h2 {
+  font-size: 24px;
+  color: #333;
+}
+
+/* Grid layout for match cards */
+.volunteer-match main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.match-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background: #ECBDC4;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.match-card h3 {
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.event-select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  flex: 1;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.search-btn {
+  background: #ffd700;
+  color: black;
+}
+
+.search-btn:hover {
+  background: #ffd700;
+}
+
+.match-btn {
+  background: #10b981;
+  color: black;
+}
+
+.match-btn:hover {
+  background: #059669;
+}

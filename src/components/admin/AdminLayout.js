@@ -1,23 +1,40 @@
 import React from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
+import "./AdminLayout.css"; 
 
 export default function AdminLayout() {
-  const { pathname } = useLocation();
-
-  const isActive = (seg) => pathname.includes(seg) ? { background: "#f3f4f6" } : {};
-
   return (
-    <div className="admin">
-      <aside className="sidebar">
-        <h3 >Admin Tools</h3>
-        <ul >
-          <li><Link to="/admin/match">Volunteer Matching</Link></li>
-          <li><Link to="/admin/notifications">Notifications</Link></li>
-          <li><Link to="/admin/history">Volunteer History</Link></li>
+    <div className="admin-layout">
+      <nav className="admin-nav">
+        <ul className="nav-list">
+          <li>
+            <NavLink 
+              to="/admin/volunteerHistory" 
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              Volunteer History
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/admin/match" 
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              Volunteer Match
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/admin/Logout" 
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              Logout
+            </NavLink>
+          </li>
         </ul>
-      </aside>
+      </nav>
 
-      <main className="content">
+      <main className="admin-content">
         <Outlet />
       </main>
     </div>

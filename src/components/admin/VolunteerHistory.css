@@ -1,0 +1,58 @@
+.event-management {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.event-management h2 {
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+/* Table Styling */
+.event-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.event-table th,
+.event-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.event-table th {
+  background: #ECBDC4;
+  font-weight: bold;
+  color: #374151;
+}
+
+.event-table tr:hover {
+  background: #f9fafb;
+}
+
+/* Volunteer list inside table */
+.volunteer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.volunteer {
+  margin-bottom: 6px;
+}
+
+.volunteer.participated {
+  color: #059669; /* green */
+  font-weight: bold;
+}
+
+.volunteer.absent {
+  color: #dc2626; /* red */
+  font-weight: bold;
+}

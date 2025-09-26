@@ -5,26 +5,26 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Logging in with:", email, password);
-    navigate("/dashboard", { replace: true });
 
     const validEmail = 'volunteer@example.com';
     const validPassword = 'password123';
 
     if (email === validEmail && password === validPassword) {
-      console.log('login succesfu! Redirecting to profile...');
+      console.log("login successful! Redirecting to profile...");
 
-      LocalStorage.setItem('isLoggedIn', 'true');
-      LocalStorage.setItem('userEmail', email);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", email);
 
-      setError(' ');
-      
-      navigate('/profile');
+      // if admin navigate to event management
+      // if volunteer navigate to volunteer dashboard
+      navigate("/admin/match", { replace: true });
     } else {
-      setError('Invalid email or pasword');
+      setError("Invalid email or password");
     }
     
   };

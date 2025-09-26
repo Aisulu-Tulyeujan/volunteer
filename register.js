@@ -36,6 +36,12 @@ function Register() {
         />
         <button type="submit">Register</button>
       </form>
+      <p className="switch-text">
+          Already have an account?
+          <Link to="/" className="switch-link">
+              Login here
+          </Link>
+      </p>
     </div>
   );
 };

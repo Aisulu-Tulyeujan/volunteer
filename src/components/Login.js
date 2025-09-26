@@ -10,6 +10,23 @@ export default function Login() {
     e.preventDefault();
     console.log("Logging in with:", email, password);
     navigate("/dashboard", { replace: true });
+
+    const validEmail = 'volunteer@example.com';
+    const validPassword = 'password123';
+
+    if (email === validEmail && password === validPassword) {
+      console.log('login succesfu! Redirecting to profile...');
+
+      LocalStorage.setItem('isLoggedIn', 'true');
+      LocalStorage.setItem('userEmail', email);
+
+      setError(' ');
+      
+      navigate('/profile');
+    } else {
+      setError('Invalid email or pasword');
+    }
+    
   };
 
   return (

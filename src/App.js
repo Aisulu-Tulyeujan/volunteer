@@ -6,6 +6,7 @@ import Dashboard from "./components/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import VolunteerHistory from "./components/admin/VolunteerHistory";
 import VolunteerMatch from "./components/admin/VolunteerMatch";
+
 import EventList from "./components/admin/EventList";
 import EventForm from "./components/admin/EventForm";
 import { seedEventsOnce } from "./api/localDb";
@@ -13,6 +14,10 @@ import { seedEventsOnce } from "./api/localDb";
 import "./styles.css";
 
 
+
+import Notifications from "./components/Notifications";
+import "./styles.css";  
+main
 
 export default function App() {
   useEffect(() => { seedEventsOnce(); }, []);
@@ -30,6 +35,7 @@ export default function App() {
             <Route path="events/new" element={<EventForm />} />
             <Route path="events/:id" element={<EventForm />} />
           </Route>
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </div>
     </Router>

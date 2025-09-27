@@ -1,0 +1,105 @@
+/* Notifications.css */
+
+/* Page container */
+#notifications-page {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Header */
+#notifications-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#notifications-header h1 {
+  font-size: 2rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Table styling */
+.notifications-table {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.notifications-table th,
+.notifications-table td {
+  padding: 15px 20px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.notifications-table th {
+  background-color: #ECBDC4;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.notifications-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hover effect */
+.notifications-table tbody tr:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+/* Notification type column */
+.notifications-table td:first-child {
+  font-weight: bold;
+  color: black;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .notifications-table,
+  .notifications-table thead,
+  .notifications-table tbody,
+  .notifications-table th,
+  .notifications-table td,
+  .notifications-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .notifications-table thead {
+    display: none;
+  }
+
+  .notifications-table tr {
+    margin-bottom: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .notifications-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .notifications-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #555;
+  }
+
+  .notifications-table td:last-child {
+    border-bottom: none;
+  }
+}

@@ -39,6 +39,14 @@ export default function AdminLayout() {
               Logout
             </NavLink>
           </li>
+          <li>
+            <NavLink
+            to="/admin/events"
+            className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              Event Management
+            </NavLink>
+          </li>
         </ul>
       </nav>
 

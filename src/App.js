@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";     
 import Register from "./components/Register"; 
@@ -6,9 +6,16 @@ import Dashboard from "./components/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import VolunteerHistory from "./components/admin/VolunteerHistory";
 import VolunteerMatch from "./components/admin/VolunteerMatch";
-import "./styles.css";  
+import EventList from "./components/admin/EventList";
+import EventForm from "./components/admin/EventForm";
+import { seedEventsOnce } from "./api/localDb";
+
+import "./styles.css";
+
+
 
 export default function App() {
+  useEffect(() => { seedEventsOnce(); }, []);
   return (
     <Router>
       <div className="App">
@@ -19,6 +26,9 @@ export default function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="volunteerHistory" element={<VolunteerHistory />} />
             <Route path="match" element={<VolunteerMatch />} />
+            <Route path="events" element={<EventList />} />
+            <Route path="events/new" element={<EventForm />} />
+            <Route path="events/:id" element={<EventForm />} />
           </Route>
         </Routes>
       </div>

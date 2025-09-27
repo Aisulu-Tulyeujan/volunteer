@@ -1,0 +1,51 @@
+.volunteer-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Sidebar nav */
+  .volunteer-nav {
+    width: 220px;
+    background-color: #ECBDC4; /* same as AdminLayout */
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .nav-list li {
+    margin-bottom: 12px;
+  }
+  
+  .nav-link {
+    display: block;
+    padding: 10px 16px;
+    color: black;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background: #374151;
+    color: white;
+  }
+  
+  .nav-link.active {
+    background: #ffd700; /* same  as AdminLayout  */
+    color: white;
+    font-weight: bold;
+  }
+  
+  /* Main content */
+  .volunteer-content {
+    flex: 1;
+    padding: 24px;
+    background: #f9fafb;
+  }
+  

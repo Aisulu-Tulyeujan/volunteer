@@ -6,6 +6,7 @@ import Dashboard from "./components/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import VolunteerHistory from "./components/admin/VolunteerHistory";
 import VolunteerMatch from "./components/admin/VolunteerMatch";
+import Notifications from "./components/Notifications";
 import "./styles.css";  
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="volunteerHistory" element={<VolunteerHistory />} />
             <Route path="match" element={<VolunteerMatch />} />
           </Route>
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </div>
     </Router>

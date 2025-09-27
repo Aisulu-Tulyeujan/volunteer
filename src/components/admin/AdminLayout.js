@@ -25,6 +25,14 @@ export default function AdminLayout() {
           </li>
           <li>
             <NavLink 
+              to="/admin/notifications" 
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              Notifications
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
               to="/admin/Logout" 
               className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
             >

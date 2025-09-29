@@ -9,6 +9,14 @@ export default function AdminLayout() {
         <ul className="nav-list">
           <li>
             <NavLink 
+              to="/eventForm" 
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              Event Form
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
               to="/admin/volunteerHistory" 
               className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
             >

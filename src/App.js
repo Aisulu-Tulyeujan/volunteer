@@ -6,20 +6,13 @@ import Dashboard from "./components/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import VolunteerHistory from "./components/admin/VolunteerHistory";
 import VolunteerMatch from "./components/admin/VolunteerMatch";
-
 import EventList from "./components/admin/EventList";
 import EventForm from "./components/admin/EventForm";
 import { seedEventsOnce } from "./api/localDb";
-
 import "./styles.css";
-
-
-
 import Notifications from "./components/Notifications";
 import VolunteerLayout from "./components/volunteer/VolunteerLayout";
 import VolunteerProfile from "./components/volunteer/VolunteerProfile";
-import "./styles.css";  
-main
 
 export default function App() {
   useEffect(() => { seedEventsOnce(); }, []);
@@ -36,12 +29,13 @@ export default function App() {
             <Route path="events" element={<EventList />} />
             <Route path="events/new" element={<EventForm />} />
             <Route path="events/:id" element={<EventForm />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
           <Route path="/volunteer" element={<VolunteerLayout />}>
             <Route path="profile" element={<VolunteerProfile />} />
           </Route>
-
-          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/eventForm" element={<EventForm />} />
+          {/* <Route path="/notifications" element={<Notifications />} /> */}
         </Routes>
       </div>
     </Router>

@@ -22,7 +22,7 @@ export default function Login() {
 
       // if admin navigate to event management
       // if volunteer navigate to volunteer dashboard
-      navigate("/admin/match", { replace: true });
+      navigate("admin/events", { replace: true });
     } else {
       setError("Invalid email or password");
     }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./VolunteerProfile.css"; // link your styles
+import "./VolunteerProfile.css";
 
 function VolunteerProfile() {
   const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ function VolunteerProfile() {
     zip: "",
     skills: [],
     preferences: "",
+    availability: [],
   });
 
   const handleChange = (e) => {
@@ -23,10 +24,26 @@ function VolunteerProfile() {
     setFormData({ ...formData, skills: selected });
   };
 
+  const handleAddDate = (e) => {
+    const date = e.target.value;
+    if (date && !formData.availability.includes(date)) {
+      setFormData({
+        ...formData,
+        availability: [...formData.availability, date],
+      });
+    }
+  };
+
+  const handleRemoveDate = (date) => {
+    setFormData({
+      ...formData,
+      availability: formData.availability.filter((d) => d !== date),
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-
   };
 
   return (
@@ -140,6 +157,32 @@ function VolunteerProfile() {
           onChange={handleChange}
         />
       </label>
+      <br />
+
+      <label>
+        Availability (Select multiple dates):
+        <input type="date" onChange={handleAddDate} />
+      </label>
+
+      <div className="selected-dates">
+        {formData.availability.length > 0 ? (
+          <ul>
+            {formData.availability.map((date, index) => (
+              <li key={index}>
+                {date}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveDate(date)}
+                >
+                  x
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No dates selected yet.</p>
+        )}
+      </div>
       <br />
 
       <button type="submit">Save Profile</button>

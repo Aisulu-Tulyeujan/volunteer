@@ -4,29 +4,38 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Logging in with:", email, password);
 
-    const validEmail = 'volunteer@example.com';
-    const validPassword = 'password123';
+    // Dummy credentials
+    const volunteerEmail = "volunteer@example.com";
+    const adminEmail = "admin@example.com";
+    const validPassword = "password123";
 
-    if (email === validEmail && password === validPassword) {
-      console.log("login successful! Redirecting to profile...");
+    if (password === validPassword && (email === volunteerEmail || email === adminEmail)) {
+      console.log("Login successful!");
 
+      // Save to localStorage
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userEmail", email);
 
-      // if admin navigate to event management
-      // if volunteer navigate to volunteer dashboard
-      navigate("admin/events", { replace: true });
+      // Save user role (important!)
+      const role = email === adminEmail ? "admin" : "volunteer";
+      localStorage.setItem("userRole", role);
+
+      // Navigate based on role
+      if (role === "admin") {
+        navigate("/admin/events", { replace: true });
+      } else {
+        navigate("/volunteer/profile", { replace: true });
+      }
     } else {
       setError("Invalid email or password");
     }
-    
   };
 
   return (

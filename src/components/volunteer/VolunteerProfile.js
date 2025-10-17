@@ -41,10 +41,21 @@ function VolunteerProfile() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  // Load existing volunteers (or empty array)
+  const volunteers = JSON.parse(localStorage.getItem("volunteers")) || [];
+
+  // Add the new one (or update existing one)
+  volunteers.push(formData);
+
+  // Save back to localStorage
+  localStorage.setItem("volunteers", JSON.stringify(volunteers));
+
+  console.log("Profile saved:", formData);
+  alert("Profile saved successfully!");
+};
 
   return (
     <form onSubmit={handleSubmit} className="volunteer-form">

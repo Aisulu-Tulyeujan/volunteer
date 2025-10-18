@@ -72,3 +72,8 @@ exports.deleteProfile = (req, res) => {
   profiles = profiles.filter((p) => p.fullName !== name);
   res.json({ message: `Profile for ${name} deleted` });
 };
+
+//for jests test 
+exports.__setProfiles = (newProfiles) => {
+  profiles = newProfiles;
+};

@@ -18,7 +18,7 @@ app.use(BodyParser.json());
 
 app.use('/api/auth', authRoutes);
 
-app.use('/profiles', volunteerRoutes);
+app.use('/api/profiles', volunteerRoutes);
 
 
 app.use("/api/events", eventRoutes);

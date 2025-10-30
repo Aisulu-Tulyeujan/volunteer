@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+const { v4: uuidv4 } = require("uuid");
 
 let events = [
   {
@@ -12,17 +12,17 @@ let events = [
   },
 ];
 
-export const getEvents = (req, res) => {
+const getEvents = (req, res) => {
   res.json(events);
 };
 
-export const getEventById = (req, res) => {
+const getEventById = (req, res) => {
   const event = events.find((e) => e.id === req.params.id);
   if (!event) return res.status(404).json({ error: "Event not found" });
   res.json(event);
 };
 
-export const createEvent = (req, res) => {
+const createEvent = (req, res) => {
   const { name, description, location, requiredSkills, urgency, date } = req.body;
 
   if (!name || !description || !location || !requiredSkills || !urgency || !date) {
@@ -34,7 +34,7 @@ export const createEvent = (req, res) => {
   res.status(201).json(newEvent);
 };
 
-export const updateEvent = (req, res) => {
+const updateEvent = (req, res) => {
   const { id } = req.params;
   const index = events.findIndex((e) => e.id === id);
   if (index === -1) return res.status(404).json({ error: "Event not found" });
@@ -43,11 +43,19 @@ export const updateEvent = (req, res) => {
   res.json(events[index]);
 };
 
-export const deleteEvent = (req, res) => {
+const deleteEvent = (req, res) => {
   const { id } = req.params;
   const index = events.findIndex((e) => e.id === id);
   if (index === -1) return res.status(404).json({ error: "Event not found" });
 
   events.splice(index, 1);
   res.status(204).send();
+};
+
+module.exports = {
+  getEvents,
+  getEventById,
+  createEvent,
+  updateEvent,
+  deleteEvent,
 };

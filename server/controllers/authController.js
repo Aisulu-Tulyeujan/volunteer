@@ -33,8 +33,9 @@ exports.register = async (req, res) => {
           return res.status(400).json({ message: "User already exists"});
     }
 
-    const newUser = new UserCredentials({ email, password });
-    await newUser.save();
+    const hashedPassword = await encryptPassword(password);
+    newUserCredentials = new UserCredentials({ email, password: hashedPassword });
+    await newUserCredentials.save();
     
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {

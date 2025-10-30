@@ -13,6 +13,8 @@ import "./styles.css";
 import Notifications from "./components/Notifications";
 import VolunteerLayout from "./components/volunteer/VolunteerLayout";
 import VolunteerProfile from "./components/volunteer/VolunteerProfile";
+import VolunteerHistoryVolunteer from "./components/volunteer/VolunteerHistory";
+
 
 export default function App() {
   useEffect(() => { seedEventsOnce(); }, []);
@@ -33,6 +35,7 @@ export default function App() {
           </Route>
           <Route path="/volunteer" element={<VolunteerLayout />}>
             <Route path="profile" element={<VolunteerProfile />} />
+            <Route path="history" element={<VolunteerHistoryVolunteer />} />
           </Route>
           <Route path="/eventForm" element={<EventForm />} />
           {/* <Route path="/notifications" element={<Notifications />} /> */}

@@ -21,7 +21,7 @@ app.use(BodyParser.json());
 
 // connect mongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected sucessfully "))
+  .then(() => console.log("MongoDB connected successfully "))
   .catch(err => console.error("MongoDB connection error:", err));
 
 app.use('/api/auth', authRoutes);
@@ -40,3 +40,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server listening on http://localhost:${PORT}`);
 });
+
+const assignmentRoutes = require('./routes/assignmentRoutes');
+app.use('/api/assignments', assignmentRoutes);

@@ -78,36 +78,56 @@ export default function VolunteerMatch() {
     }));
   };
 
-  // ✅ Volunteer is matched to event (with backend-like update)
-  const handleMatch = (volunteer, event) => {
-    if (event.assignedVolunteers >= event.neededVolunteers) {
-      alert(`Sorry, ${event.name} is already full.`);
-      return;
+
+  const API_BASE = process.env.REACT_APP_API || 'http://localhost:3000';
+
+  const handleMatch = async (volunteer, event) => {
+    try {
+      // Replace local full-name lookups with real _id if you have them.
+      // Assuming volunteer._id and event._id exist (best practice).
+      // If you only have names now, you’ll need to fetch by name -> id on the backend.
+      const payload = {
+        userId: volunteer._id,     // <-- ensure your admin list includes user IDs
+        eventId: event._id,        // <-- ensure events have IDs
+        matchScore: event.score || 0
+      };
+
+      const res = await fetch(`${API_BASE}/api/assignments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Match failed');
+        return;
+      }
+
+      // optimistic UI updates (optional)
+      const updatedEvents = events.map((ev) =>
+        ev._id === event._id
+          ? { ...ev, assignedVolunteers: (ev.assignedVolunteers || 0) + 1 }
+          : ev
+      );
+      setEvents(updatedEvents);
+      localStorage.setItem("events", JSON.stringify(updatedEvents));
+
+      const updatedVolunteers = volunteers.filter(v => v._id !== volunteer._id);
+      setVolunteers(updatedVolunteers);
+      localStorage.setItem("volunteers", JSON.stringify(updatedVolunteers));
+
+      const updatedMatches = { ...matchedEvents };
+      delete updatedMatches[volunteer.fullName];
+      setMatchedEvents(updatedMatches);
+
+      alert(`${volunteer.fullName} successfully matched to ${event.name}!`);
+    } catch (e) {
+      console.error(e);
+      alert('Server error while matching');
     }
-
-    // 🧠 Update event data (simulate backend update)
-    const updatedEvents = events.map((ev) =>
-      ev.name === event.name
-        ? { ...ev, assignedVolunteers: ev.assignedVolunteers + 1 }
-        : ev
-    );
-    setEvents(updatedEvents);
-    localStorage.setItem("events", JSON.stringify(updatedEvents));
-
-    // 🧠 Remove matched volunteer from the system (optional)
-    const updatedVolunteers = volunteers.filter(
-      (v) => v.fullName !== volunteer.fullName
-    );
-    setVolunteers(updatedVolunteers);
-    localStorage.setItem("volunteers", JSON.stringify(updatedVolunteers));
-
-    // 🧠 Remove volunteer from match results view
-    const updatedMatches = { ...matchedEvents };
-    delete updatedMatches[volunteer.fullName];
-    setMatchedEvents(updatedMatches);
-
-    alert(`${volunteer.fullName} successfully matched to ${event.name}!`);
   };
+
 
   return (
     <div className="volunteer-match">

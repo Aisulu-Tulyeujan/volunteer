@@ -2,6 +2,7 @@ const express = require('express');
 const BodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const volunteerRoutes = require('./routes/volunteerRoutes'); 
 const eventRoutes = require('./routes/eventRoutes');
@@ -11,18 +12,23 @@ const notificationRoutes = require('./routes/notificationRoutes');
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(BodyParser.json());
+
+// connect mongoDB
+mongoose.connect(process.env.MONGO_URI);
+  .then(() => console.log("MongoDB connected sucessfully "))
+  .catch(err => console.error("MongoDB connection error:", err));
 
 app.use('/api/auth', authRoutes);
 
 app.use('/api/profiles', volunteerRoutes);
 
 
-app.use("/api/events", eventRoutes);
-app.use("/api/notifications", notificationRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 
 app.get('/', (req, res) => {
@@ -30,5 +36,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log('Server listening on http://localhost:${PORT}');
+    console.log(`Server listening on http://localhost:${PORT}`);
 });

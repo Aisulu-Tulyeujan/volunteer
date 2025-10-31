@@ -2,13 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+<<<<<<< HEAD
+=======
+const path = require('path');
+>>>>>>> 15d192d (Initial commit)
 const authRoutes = require('./routes/authRoutes');
 const volunteerRoutes = require('./routes/volunteerRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 
-
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env'), override: true });
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -50,7 +53,15 @@ app.use('/api/assignments', assignmentRoutes);
 
 const startServer = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
+
+        const mongoUri = process.env.MONGO_URI
+        if (!mongoUri) {
+          console.error('MONGO_URI/MONGODB_URI not set. Check server/.env');
+          process.exit(1);
+        }
+
+        await mongoose.connect(mongoUri, { dbName: 'VolunteerApp' });
+        
         console.log("MongoDB connected successfully");
         app.listen(PORT, () => {
             console.log(`Server running successfully on port ${PORT}`);

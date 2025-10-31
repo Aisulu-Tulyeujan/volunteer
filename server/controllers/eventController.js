@@ -14,21 +14,38 @@ const sanitizeEvent = (doc) => ({
   updatedAt: doc.updatedAt,
 });
 
-const buildPayload = (body) => {
-  const payload = {
-    eventName: body.eventName || body.name,
-    description: body.description,
-    location: body.location,
-    requiredSkills: body.requiredSkills || [],
-    urgency: body.urgency,
-    eventDate: body.eventDate ? new Date(body.eventDate) : undefined,
-    neededVolunteers: body.neededVolunteers ?? 1,
-  };
+const isProvided = (v) => v !== undefined && v !== null && v !== "";
 
-  // allow manual override when editing
-  if (body.assignedVolunteers != null) {
-    payload.assignedVolunteers = body.assignedVolunteers;
+const normalizeSkills = (val) => {
+  if (!isProvided(val)) return undefined;
+  if (Array.isArray(val)) return val;
+  return String(val)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+};
+
+const buildPayload = (body) => {
+  const payload = {};
+
+  if (isProvided(body.eventName) || isProvided(body.name)) {
+    payload.eventName = body.eventName || body.name;
   }
+  if (isProvided(body.description)) payload.description = body.description;
+  if (isProvided(body.location)) payload.location = body.location;
+
+  const skills = normalizeSkills(body.requiredSkills);
+  if (isProvided(skills)) payload.requiredSkills = skills;
+
+  if (isProvided(body.urgency)) payload.urgency = body.urgency;
+
+  if (isProvided(body.eventDate)) {
+    const d = new Date(body.eventDate);
+    if (!isNaN(d.getTime())) payload.eventDate = d;
+  }
+
+  if (isProvided(body.neededVolunteers)) payload.neededVolunteers = body.neededVolunteers;
+  if (isProvided(body.assignedVolunteers)) payload.assignedVolunteers = body.assignedVolunteers;
 
   return payload;
 };
@@ -85,15 +102,20 @@ exports.updateEvent = async (req, res) => {
       return res.status(404).json({ error: "Event not found" });
     }
 
-    Object.assign(event, payload);
+    Object.entries(payload).forEach(([k, v]) => {
+      event.set(k, v);
+    });
+
     await event.save();
 
-    res.json(sanitizeEvent(event));
+    return res.json(sanitizeEvent(event));
   } catch (err) {
-    console.error("Failed to update event", err);
+    console.error("Failed to update event:", err?.name, err?.message, err?.errors);
     res.status(400).json({ error: "Failed to update event" });
   }
 };
+
+
 
 exports.deleteEvent = async (req, res) => {
   try {

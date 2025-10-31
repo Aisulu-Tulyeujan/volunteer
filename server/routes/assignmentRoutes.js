@@ -61,16 +61,43 @@ router.post('/', async (req, res) => {
       return res.status(409).json({ error: 'Event is already full' });
     }
 
+    const now = new Date();
+    const eventDate = event.eventDate ? new Date(event.eventDate) : null;
+    const isPastEvent = eventDate && !Number.isNaN(eventDate.getTime()) && eventDate < now;
+
     // Create assignment (unique on userId+eventId)
-    const assignment = await VolunteerAssignment.create({
-      userId, eventId, matchScore, status: 'Assigned'
+    let assignment = await VolunteerAssignment.create({
+      userId,
+      eventId,
+      matchScore,
+      status: isPastEvent ? 'Completed' : 'Assigned'
     });
+
+    if (isPastEvent) {
+      const participationDate = eventDate || now;
+      await VolunteerHistory.findOneAndUpdate(
+        { userId, eventId },
+        {
+          $setOnInsert: {
+            userId,
+            eventId,
+            participationDate
+          }
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+    }
 
     // bump assigned count
     event.assignedVolunteers = (event.assignedVolunteers || 0) + 1;
     await event.save();
 
-    return res.status(201).json({ message: 'Volunteer matched successfully', assignment });
+    assignment = await assignment.populate('eventId');
+
+    return res.status(201).json({
+      message: 'Volunteer matched successfully',
+      assignment: serializeAssignment(assignment)
+    });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ error: 'Volunteer already assigned to this event' });

@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllEvents, deleteEvent } from "../../api/localDb";
 
 export default function EventList() {
   const nav = useNavigate();
-  const rows = getAllEvents().slice().sort((a,b)=>a.eventDate.localeCompare(b.eventDate));
+  const [rows, setRows] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getAllEvents()
+      .then((list) =>
+        setRows(list.slice().sort((a, b) => a.eventDate.localeCompare(b.eventDate)))
+      )
+      .catch((e) => setError(e.message));
+  }, []);
 
   const onDelete = (id) => {
     if (!window.confirm("Delete this event?")) return;
-    deleteEvent(id);
-    nav(0); 
+    deleteEvent(id)
+      .then(() => setRows((prev) => prev.filter((e) => e.id !== id)))
+      .catch((e) => alert(e.message));
   };
 
   return (
@@ -19,6 +29,8 @@ export default function EventList() {
         <Link className="btn" to="/admin/events/new">+ Create Event</Link>
       </div>
 
+      {!!error && <div className="card err">{error}</div>}
+
       <div className="card">
         <table className="event-table">
           <thead>
@@ -27,19 +39,21 @@ export default function EventList() {
             </tr>
           </thead>
           <tbody>
-            {rows.map(e => (
+            {rows.map((e) => (
               <tr key={e.id}>
-                <td>{e.eventDate}</td>
+                <td>{e.eventDate ? new Date(e.eventDate).toLocaleDateString() : ""}</td>
                 <td>{e.name}</td>
                 <td>{e.urgency}</td>
-                <td>{e.requiredSkills.join(", ")}</td>
+                <td>{Array.isArray(e.requiredSkills) ? e.requiredSkills.join(", ") : ""}</td>
                 <td>
                   <button className="btn" onClick={() => nav(`/admin/events/${e.id}`)}>Edit</button>
                   <button className="btn btn-danger" onClick={() => onDelete(e.id)}>Delete</button>
                 </td>
               </tr>
             ))}
-            {!rows.length && <tr><td colSpan="5">No events yet.</td></tr>}
+            {!rows.length && (
+              <tr><td colSpan="5">No events yet.</td></tr>
+            )}
           </tbody>
         </table>
       </div>

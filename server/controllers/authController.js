@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserCredentials = require("../models/UserCredentials");
+const UserProfile = require("../models/UserProfile");
 const { encryptPassword, checkPassword } = require("../utils/passwordUtils");
 
 const validate = (name, email, password) => {
@@ -37,10 +38,27 @@ exports.register = async (req, res) => {
     const hashedPassword = await encryptPassword(password);
     const newUser = new UserCredentials({ name, email, password: hashedPassword});
     await newUser.save();
+
+    const newUserProfile = new UserProfile({
+            user: newUser._id,
+            fullName: name,
+            address: '',
+            city: '',
+            state: '',
+            zipcode: '',
+            skills: [],
+            preferences: [],
+            availability: []
+        });
+        await newUserProfile.save();
     
-    res.status(201).json({ message: "User registered successfully" });
+        res.status(201).json({
+             message: "User registered successfully (credentials + initial profile created)",
+            userId: newUser._id
+         });
   } catch (err) {
     console.error("Register error", err);
+    const status = (err.name === 'ValidationError' || err.code === 11000) ? 400 : 500;
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
@@ -65,12 +83,21 @@ exports.login = async (req, res) => {
     }
     
     const token = jwt.sign(
-        { id: user._id, email: user.email },
+        { id: user._id, email: user.email, role: user.role },
         process.env.JWT_SECRET || "DEV_SECRET",
         { expiresIn: "1h" }
     );
 
-    res.json({ message: "Login successful", token });
+    res.json({ 
+        message: "Login successful", 
+        token,
+         user: {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+        }
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error", error: err.message });

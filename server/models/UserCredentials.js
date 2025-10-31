@@ -15,7 +15,12 @@ const userCredentialsSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'volunteer'],
+        default: 'volunteer'
+    },
 });
 
 

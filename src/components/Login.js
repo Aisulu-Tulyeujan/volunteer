@@ -25,6 +25,18 @@ export default function Login() {
         throw new Error(data.message || "Login failed");
       }
 
+      const authPayload = {
+        token: data.token,
+        user: {
+          id: data.user.id || data.user._id,
+          _id: data.user._id || data.user.id,
+          email: data.user.email,
+          role: data.user.role,
+          name: data.user.name,
+        },
+      };
+
+      localStorage.setItem("auth", JSON.stringify(authPayload));
       localStorage.setItem("token", data.token);
       localStorage.setItem("userEmail", data.user.email);
       localStorage.setItem("userRole", data.user.role);

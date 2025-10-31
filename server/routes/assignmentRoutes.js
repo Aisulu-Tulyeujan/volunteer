@@ -5,7 +5,45 @@ const mongoose = require('mongoose');
 
 const VolunteerAssignment = require('../models/VolunteerAssignment');
 const VolunteerHistory = require('../models/VolunteerHistoryUser');
-const EventDetails = require('../models/EventDetails'); // ensure this exists
+const EventDetails = require('../models/EventDetails');
+
+const sanitizeEvent = (event) => {
+  if (!event) return null;
+  return {
+    _id: event._id,
+    eventName: event.eventName,
+    description: event.description,
+    location: event.location,
+    requiredSkills: event.requiredSkills,
+    urgency: event.urgency,
+    eventDate: event.eventDate,
+    neededVolunteers: event.neededVolunteers,
+    assignedVolunteers: event.assignedVolunteers,
+  };
+};
+
+const sanitizeUser = (user) => {
+  if (!user) return null;
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+};
+
+const serializeAssignment = (assignment, { includeUser = false } = {}) => ({
+  _id: assignment._id,
+  userId: assignment.userId?._id || assignment.userId,
+  eventId: assignment.eventId?._id || assignment.eventId,
+  status: assignment.status,
+  matchScore: assignment.matchScore,
+  assignedDate: assignment.assignedDate,
+  createdAt: assignment.createdAt,
+  updatedAt: assignment.updatedAt,
+  event: sanitizeEvent(assignment.eventId),
+  ...(includeUser ? { user: sanitizeUser(assignment.userId) } : {}),
+});
 
 // POST /api/assignments  -> Admin clicks "Match"
 router.post('/', async (req, res) => {
@@ -47,45 +85,56 @@ router.get('/volunteers/:userId/assignments', async (req, res) => {
   try {
     const { userId } = req.params;
     const { tab = 'upcoming' } = req.query;
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ error: 'Invalid userId' });
+    }
 
     const now = new Date();
 
-    // Join with EventDetails so we can return all event fields + status
-    const pipeline = [
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-      {
-        $lookup: {
-          from: 'eventdetails', // collection name for EventDetails (check your actual)
-          localField: 'eventId',
-          foreignField: '_id',
-          as: 'event'
-        }
-      },
-      { $unwind: '$event' }
-    ];
+    const assignments = await VolunteerAssignment.find({ userId })
+      .populate('eventId')
+      .sort({ assignedDate: -1 });
 
-    if (tab === 'upcoming') {
-      pipeline.push({
-        $match: {
-          'event.eventDate': { $gte: now },
-          status: { $in: ['Assigned', 'Confirmed'] }
-        }
-      });
-    } else if (tab === 'past') {
-      pipeline.push({
-        $match: {
-          $or: [
-            { 'event.eventDate': { $lt: now } },
-            { status: 'Completed' }
-          ]
-        }
-      });
+    const filtered = assignments.filter((assignment) => {
+      const event = assignment.eventId;
+      if (!event || !event.eventDate) return false;
+      const eventDate = new Date(event.eventDate);
+
+      if (tab === 'upcoming') {
+        return eventDate >= now && ['Assigned', 'Confirmed'].includes(assignment.status);
+      }
+      if (tab === 'past') {
+        return eventDate < now || assignment.status === 'Completed';
+      }
+      return true;
+    }).sort((a, b) => {
+      const aDate = new Date(a.eventId.eventDate);
+      const bDate = new Date(b.eventId.eventDate);
+      return aDate - bDate;
+    });
+
+    res.json(filtered.map((row) => serializeAssignment(row)));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/assignments/history -> Admin view of all matches/history
+router.get('/history', async (req, res) => {
+  try {
+    const { status } = req.query;
+    const query = {};
+    if (status) {
+      query.status = status;
     }
 
-    pipeline.push({ $sort: { 'event.eventDate': 1 } });
+    const assignments = await VolunteerAssignment.find(query)
+      .populate('eventId')
+      .populate({ path: 'userId', select: 'name email role' })
+      .sort({ assignedDate: -1 });
 
-    const rows = await VolunteerAssignment.aggregate(pipeline);
-    res.json(rows);
+    res.json(assignments.map((assignment) => serializeAssignment(assignment, { includeUser: true })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

@@ -1,61 +1,109 @@
-const { v4: uuidv4 } = require("uuid");
+const EventDetails = require("../models/EventDetails");
 
-let events = [
-  {
-    id: uuidv4(),
-    name: "Food Drive",
-    description: "Collect and distribute food at the community hall.",
-    location: "Community Hall",
-    requiredSkills: ["Organization", "Teamwork"],
-    urgency: "High",
-    date: "2025-11-20",
-  },
-];
+const sanitizeEvent = (doc) => ({
+  _id: doc._id,
+  eventName: doc.eventName,
+  description: doc.description,
+  location: doc.location,
+  requiredSkills: doc.requiredSkills,
+  urgency: doc.urgency,
+  eventDate: doc.eventDate,
+  neededVolunteers: doc.neededVolunteers,
+  assignedVolunteers: doc.assignedVolunteers,
+  createdAt: doc.createdAt,
+  updatedAt: doc.updatedAt,
+});
 
-const getEvents = (req, res) => {
-  res.json(events);
-};
+const buildPayload = (body) => {
+  const payload = {
+    eventName: body.eventName || body.name,
+    description: body.description,
+    location: body.location,
+    requiredSkills: body.requiredSkills || [],
+    urgency: body.urgency,
+    eventDate: body.eventDate ? new Date(body.eventDate) : undefined,
+    neededVolunteers: body.neededVolunteers ?? 1,
+  };
 
-const getEventById = (req, res) => {
-  const event = events.find((e) => e.id === req.params.id);
-  if (!event) return res.status(404).json({ error: "Event not found" });
-  res.json(event);
-};
-
-const createEvent = (req, res) => {
-  const { name, description, location, requiredSkills, urgency, date } = req.body;
-
-  if (!name || !description || !location || !requiredSkills || !urgency || !date) {
-    return res.status(400).json({ error: "All fields are required." });
+  // allow manual override when editing
+  if (body.assignedVolunteers != null) {
+    payload.assignedVolunteers = body.assignedVolunteers;
   }
 
-  const newEvent = { id: uuidv4(), name, description, location, requiredSkills, urgency, date };
-  events.push(newEvent);
-  res.status(201).json(newEvent);
+  return payload;
 };
 
-const updateEvent = (req, res) => {
-  const { id } = req.params;
-  const index = events.findIndex((e) => e.id === id);
-  if (index === -1) return res.status(404).json({ error: "Event not found" });
-
-  events[index] = { ...events[index], ...req.body };
-  res.json(events[index]);
+exports.getEvents = async (req, res) => {
+  try {
+    const events = await EventDetails.find().sort({ eventDate: 1 });
+    res.json(events.map(sanitizeEvent));
+  } catch (err) {
+    console.error("Failed to fetch events", err);
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
 };
 
-const deleteEvent = (req, res) => {
-  const { id } = req.params;
-  const index = events.findIndex((e) => e.id === id);
-  if (index === -1) return res.status(404).json({ error: "Event not found" });
-
-  events.splice(index, 1);
-  res.status(204).send();
+exports.getEventById = async (req, res) => {
+  try {
+    const event = await EventDetails.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    res.json(sanitizeEvent(event));
+  } catch (err) {
+    console.error("Failed to fetch event", err);
+    res.status(400).json({ error: "Invalid event id" });
+  }
 };
 
-module.exports = {
-  getEvents,
-  getEventById,
-  createEvent,
-  updateEvent,
-  deleteEvent,
+exports.createEvent = async (req, res) => {
+  try {
+    const payload = buildPayload(req.body);
+
+    if (!payload.eventName || !payload.description || !payload.location || !payload.urgency || !payload.eventDate) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    const doc = new EventDetails({
+      ...payload,
+      assignedVolunteers: req.body.assignedVolunteers || 0,
+    });
+    await doc.save();
+    res.status(201).json(sanitizeEvent(doc));
+  } catch (err) {
+    console.error("Failed to create event", err);
+    res.status(500).json({ error: "Failed to create event" });
+  }
+};
+
+exports.updateEvent = async (req, res) => {
+  try {
+    const payload = buildPayload(req.body);
+
+    const event = await EventDetails.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    Object.assign(event, payload);
+    await event.save();
+
+    res.json(sanitizeEvent(event));
+  } catch (err) {
+    console.error("Failed to update event", err);
+    res.status(400).json({ error: "Failed to update event" });
+  }
+};
+
+exports.deleteEvent = async (req, res) => {
+  try {
+    const event = await EventDetails.findByIdAndDelete(req.params.id);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    res.status(204).send();
+  } catch (err) {
+    console.error("Failed to delete event", err);
+    res.status(400).json({ error: "Failed to delete event" });
+  }
 };

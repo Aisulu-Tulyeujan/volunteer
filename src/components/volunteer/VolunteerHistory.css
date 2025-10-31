@@ -5,3 +5,4 @@
 .vh-table { width: 100%; border-collapse: collapse; }
 .vh-table th, .vh-table td { border: 1px solid #e1e1e1; padding: 8px; vertical-align: top; }
 .vh-table th { background: #fafafa; text-align: left; }
+.error { color: #dc2626; }

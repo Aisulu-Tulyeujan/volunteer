@@ -36,6 +36,29 @@
   background: #f9fafb;
 }
 
+.tabs {
+  margin: 0 0 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tabs button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #d1d5db;
+  background: #f3f4f6;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: #fff;
+  border-color: #9ca3af;
+  font-weight: 600;
+}
+
+.error {
+  color: #dc2626;
+}
+
 /* Volunteer list inside table */
 .volunteer-list {
   list-style: none;

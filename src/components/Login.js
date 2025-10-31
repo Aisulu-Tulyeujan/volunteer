@@ -7,35 +7,37 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", email, password);
+    setError("");
 
-    // Dummy credentials
-    const volunteerEmail = "volunteer@example.com";
-    const adminEmail = "admin@example.com";
-    const validPassword = "password123";
+    try {
+      const response = await fetch("http://localhost:5050/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email,password }),
+      });
 
-    if (password === validPassword && (email === volunteerEmail || email === adminEmail)) {
-      console.log("Login successful!");
+      const data = await response.json();
+      console.log("Login response:", data);
 
-      // Save to localStorage
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", email);
-
-      // Save user role (important!)
-      const role = email === adminEmail ? "admin" : "volunteer";
-      localStorage.setItem("userRole", role);
-
-      // Navigate based on role
-      if (role === "admin") {
-        navigate("/admin/events", { replace: true });
-      } else {
-        navigate("/volunteer/profile", { replace: true });
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
       }
-    } else {
-      setError("Invalid email or password");
-    }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("userRole", data.user.role);
+    
+      if (data.user.role === "admin") {
+        navigate("/admin/events",{replace: true });   
+      } else {
+        navigate("/volunteer/profile", {replace: true });
+      }
+    } catch (err) {
+        console.error("Login error:", err);
+        setError(err.message);
+      }
   };
 
   return (
@@ -58,6 +60,9 @@ export default function Login() {
         />
         <button type="submit">Submit</button>
       </form>
+
+      {error && <p className="error">{error}</p>}
+
 
       <p className="switch-text">
         Don't have an account?

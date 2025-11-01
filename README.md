@@ -1,70 +1,84 @@
-# Getting Started with Create React App
+# Volunteer Coordination Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Centralized tooling for pairing volunteers to community events. The project is split into a React frontend (`src/`) and an Express/Mongoose backend (`server/`).
 
-## Available Scripts
+## Quick Start
+- **Install dependencies** (front+back): `npm install`
+- **Environment variables**: copy `server/.env.example` to `server/.env` and provide `MONGO_URI`, `JWT_SECRET`, and optional `ALLOWED_ORIGINS`.
+- **Run backend API**: `node server/server.js`
+- **Run frontend dev server**: `npm start`
 
-In the project directory, you can run:
+## Architecture
+```
+volunteer-1/
+├── src/                # React app and client-side tests
+├── server/             # Express server, routes, controllers, models
+│   ├── controllers/    # auth, volunteer, event, notification, assignments
+│   ├── routes/         # express.Router definitions
+│   ├── models/         # Mongoose schemas
+│   └── utils/          # password helpers, etc.
+└── coverage/           # Jest coverage outputs (`npm test -- --coverage`)
+```
 
-### `npm start`
+### Core Models
+- **UserCredentials** (`server/models/UserCredentials.js`): name, email (unique), hashed password, role (`admin | volunteer`).
+- **UserProfile** (`server/models/UserProfile.js`): one-to-one with credentials; stores demographics, skills, preferences, availability.
+- **EventDetails** (`server/models/EventDetails.js`): volunteer opportunities with scheduling and staffing counts.
+- **VolunteerAssignment** (`server/models/VolunteerAssignment.js`): links user + event, tracks status (`Assigned`, `Confirmed`, `Declined`, `Completed`, `Cancelled`), ensures user/event uniqueness.
+- **VolunteerHistoryUser** (`server/models/VolunteerHistoryUser.js`): audit log of completed participation.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Scripts
+| Command | Description |
+| --- | --- |
+| `npm start` | React dev server on port 3000. |
+| `npm run build` | Production build of the frontend. |
+| `node server/server.js` | Launches the Express API (defaults to port 5050). |
+| `npm run seed:demo` | Seeds sample data (requires valid MongoDB connection). |
+| `npm test` | Jest in watch mode (client-side default). |
+| `CI=true npm test -- --coverage --watchAll=false` | Single-pass test run with combined client + backend coverage report. |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Coverage Output
+- Summary printed to console after the coverage run.
+- Detailed HTML report: `coverage/lcov-report/index.html`
+- Raw data: `coverage/lcov.info`, `coverage/coverage-final.json`
 
-### `npm test`
+## API Overview
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Create credentials and bootstrap profile. |
+| `POST` | `/api/auth/login` | Issue JWT for valid credentials. |
+| `GET` | `/api/volunteers` | List profiles with optional `role`, `email` filters. |
+| `POST` | `/api/volunteers` | Create profile tied to existing user credentials. |
+| `PUT` | `/api/volunteers/:id` | Update profile fields. |
+| `DELETE` | `/api/volunteers/:id` | Remove a volunteer profile. |
+| `GET` | `/api/events` | Fetch all events ordered by date. |
+| `POST` | `/api/events` | Create event (requires name, description, location, urgency, date). |
+| `PATCH` | `/api/assignments/:id/status` | Update volunteer assignment status and optionally log history. |
+| `GET` | `/api/volunteers/:userId/assignments` | Volunteer’s upcoming/past assignments (`?tab=upcoming|past`). |
+| `POST` | `/api/assignments` | Match a volunteer to an event (enforces capacity + duplicates). |
 
-### `npm run build`
+> Authentication middleware (`authMiddleware` + `adminMiddleware`) protects selected admin endpoints. Add `Authorization: Bearer <token>` from `/api/auth/login`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Testing Strategy
+- Jest covers React components under `src/components/**/__tests__` and server logic under `src/__tests__/**`.
+- Backend suites stub Mongoose models and focus on controller/route behavior without touching a real database.
+- CI coverage target is ≥ 80% statements/lines. Current metrics sit around ~85% lines / ~80% branches.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Development Notes
+- Node version ≥ 18 recommended.
+- MongoDB connection string must be reachable from your machine (Atlas IP allowlist or local instance).
+- CORS defaults to `http://localhost:3000`; override via `ALLOWED_ORIGINS` in `.env`.
+- For production, serve the React build via a dedicated host (e.g., Netlify, Vercel) and deploy the Express API separately (e.g., Render, Railway, Heroku).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Troubleshooting
+- **`MONGO_URI not set`**: ensure `server/.env` is created and accessible before starting the server.
+- **Tests stuck in watch mode**: run with `CI=true` to enforce single pass.
+- **Coverage below threshold**: target uncovered branches highlighted in `coverage/lcov-report/index.html`.
 
-### `npm run eject`
+## Contributing
+1. Create a feature branch.
+2. Ensure `npm test` and coverage pass.
+3. Submit PR with summary of changes, tests run, and screenshots if UI changes were made.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Happy volunteering! 🎉

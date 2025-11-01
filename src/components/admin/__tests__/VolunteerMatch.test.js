@@ -55,7 +55,7 @@ describe('VolunteerMatch', () => {
       json: async () => ({ message: 'Volunteer matched successfully' }),
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /match/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Match$/i }));
 
     await waitFor(() =>
       expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Alex Volunteer'))

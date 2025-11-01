@@ -138,61 +138,66 @@ export default function VolunteerMatch() {
     }
   };
 
-  if (loading) {
-    return <p>Loading matches...</p>;
-  }
+  const renderBody = () => {
+    if (loading) {
+      return <p>Loading matches...</p>;
+    }
 
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
+    if (error) {
+      return <p className="error">{error}</p>;
+    }
+
+    if (volunteers.length === 0) {
+      return <p>No volunteers available to match. All are assigned or none exist.</p>;
+    }
+
+    return (
+      <div className="volunteer-list">
+        {volunteers.map((vol) => (
+          <div key={vol._id} className="volunteer-card">
+            <h3>{vol.fullName || vol.user?.name}</h3>
+            <p><strong>City:</strong> {vol.city || "N/A"}</p>
+            <p><strong>Skills:</strong> {vol.skills?.join(", ") || "None"}</p>
+
+            <button className="btn search-btn" onClick={() => handleSearch(vol)}>
+              Search Best Matches
+            </button>
+
+            {matchedEvents[vol._id]?.length ? (
+              <div className="event-results">
+                <h4>Matched Events</h4>
+                <ul>
+                  {matchedEvents[vol._id].map((event) => (
+                    <li key={event._id}>
+                      <strong>{event.eventName}</strong> — Score: {event.score}{" "}
+                      ({event.assignedVolunteers}/{event.neededVolunteers})
+                      {(event.assignedVolunteers || 0) >= (event.neededVolunteers || 0) ? (
+                        <span style={{ color: "red" }}> (Full)</span>
+                      ) : (
+                        <button
+                          className="btn match-btn"
+                          onClick={() => handleMatch(vol, event)}
+                        >
+                          Match
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="volunteer-match">
       <header>
         <h2>Volunteer Matching Dashboard</h2>
       </header>
-
-      {volunteers.length === 0 ? (
-        <p>No volunteers available to match. All are assigned or none exist.</p>
-      ) : (
-        <div className="volunteer-list">
-          {volunteers.map((vol) => (
-            <div key={vol._id} className="volunteer-card">
-              <h3>{vol.fullName || vol.user?.name}</h3>
-              <p><strong>City:</strong> {vol.city || "N/A"}</p>
-              <p><strong>Skills:</strong> {vol.skills?.join(", ") || "None"}</p>
-
-              <button className="btn search-btn" onClick={() => handleSearch(vol)}>
-                Search Best Matches
-              </button>
-
-              {matchedEvents[vol._id]?.length ? (
-                <div className="event-results">
-                  <h4>Matched Events</h4>
-                  <ul>
-                    {matchedEvents[vol._id].map((event) => (
-                      <li key={event._id}>
-                        <strong>{event.eventName}</strong> — Score: {event.score}{" "}
-                        ({event.assignedVolunteers}/{event.neededVolunteers})
-                        {(event.assignedVolunteers || 0) >= (event.neededVolunteers || 0) ? (
-                          <span style={{ color: "red" }}> (Full)</span>
-                        ) : (
-                          <button
-                            className="btn match-btn"
-                            onClick={() => handleMatch(vol, event)}
-                          >
-                            Match
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
-      )}
+      {renderBody()}
     </div>
   );
 }

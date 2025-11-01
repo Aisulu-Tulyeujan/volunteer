@@ -3,8 +3,12 @@ import '@testing-library/jest-dom';
 beforeEach(() => {
   // Ensure clean mocks for every test
   global.fetch = jest.fn();
-  window.alert = jest.fn();
-  window.localStorage.clear();
+  if (typeof window !== 'undefined') {
+    window.alert = jest.fn();
+    if (window.localStorage && typeof window.localStorage.clear === 'function') {
+      window.localStorage.clear();
+    }
+  }
 });
 
 afterEach(() => {

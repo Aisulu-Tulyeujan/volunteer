@@ -1,28 +1,92 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./VolunteerProfile.css";
 
-function VolunteerProfile() {
+export default function VolunteerProfile() {
   const [formData, setFormData] = useState({
     fullName: "",
-    address1: "",
-    address2: "",
+    address: "",
     city: "",
     state: "",
-    zip: "",
+    zipcode: "",
     skills: [],
-    preferences: "",
+    preferences: [],
     availability: [],
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const [profileId, setProfileId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  const token = auth?.token;
+  const userId = auth?.user?._id;
+
+  //  Fetch users profile from backend
+  useEffect(() => {
+    if (!token || !userId) return;
+
+    fetch(`http://localhost:5050/api/volunteers?userId=${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((profiles) => {
+        const profile = Array.isArray(profiles)
+          ? profiles.find((p) => p.user?._id === userId)
+          : null;
+
+        if (profile) {
+          setProfileId(profile._id);
+          setFormData({
+            fullName: profile.fullName,
+            address: profile.address,
+            city: profile.city,
+            state: profile.state,
+            zipcode: profile.zipcode,
+            skills: profile.skills || [],
+            preferences: profile.preferences || [],
+            availability: profile.availability || [],
+          });
+        }
+
+        setIsLoading(false);
+      })
+      .catch((err) => console.error("Error loading profile:", err));
+  }, [token, userId]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const url = profileId
+      ? `http://localhost:5050/api/volunteers/${profileId}`
+      : `http://localhost:5050/api/volunteers`;
+
+    const method = profileId ? "PUT" : "POST";
+    const body = profileId ? formData : { ...formData, userId };
+
+    fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!profileId) setProfileId(data._id);
+        alert(profileId ? "Profile updated!" : "Profile created!");
+      })
+      .catch((err) => console.error("Error saving profile:", err));
   };
 
-  const handleSkillsChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-    setFormData({ ...formData, skills: selected });
-  };
+  // input handlers
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSkillsChange = (e) =>
+    setFormData({
+      ...formData,
+      skills: Array.from(e.target.selectedOptions, (opt) => opt.value),
+    });
 
   const handleAddDate = (e) => {
     const date = e.target.value;
@@ -34,171 +98,66 @@ function VolunteerProfile() {
     }
   };
 
-  const handleRemoveDate = (date) => {
+  const handleRemoveDate = (date) =>
     setFormData({
       ...formData,
       availability: formData.availability.filter((d) => d !== date),
     });
-  };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-
-  // Load existing volunteers (or empty array)
-  const volunteers = JSON.parse(localStorage.getItem("volunteers")) || [];
-
-  // Add the new one (or update existing one)
-  volunteers.push(formData);
-
-  // Save back to localStorage
-  localStorage.setItem("volunteers", JSON.stringify(volunteers));
-
-  console.log("Profile saved:", formData);
-  alert("Profile saved successfully!");
-};
+  if (isLoading) return <p>Loading profile...</p>;
 
   return (
     <form onSubmit={handleSubmit} className="volunteer-form">
+      <h2>Volunteer Profile</h2>
       <label>
         Full Name:
-        <input
-          type="text"
-          name="fullName"
-          value={formData.fullName}
-          maxLength="50"
-          required
-          onChange={handleChange}
-        />
+        <input name="fullName" value={formData.fullName} onChange={handleChange} required />
       </label>
-      <br />
-
       <label>
-        Address 1:
-        <input
-          type="text"
-          name="address1"
-          value={formData.address1}
-          maxLength="100"
-          required
-          onChange={handleChange}
-        />
+        Address:
+        <input name="address" value={formData.address} onChange={handleChange} required />
       </label>
-      <br />
-
-      <label>
-        Address 2:
-        <input
-          type="text"
-          name="address2"
-          value={formData.address2}
-          maxLength="100"
-          onChange={handleChange}
-        />
-      </label>
-      <br />
-
       <label>
         City:
-        <input
-          type="text"
-          name="city"
-          value={formData.city}
-          maxLength="100"
-          required
-          onChange={handleChange}
-        />
+        <input name="city" value={formData.city} onChange={handleChange} required />
       </label>
-      <br />
-
       <label>
         State:
-        <select
-          name="state"
-          value={formData.state}
-          required
-          onChange={handleChange}
-        >
-          <option value="">Select a state</option>
+        <select name="state" value={formData.state} onChange={handleChange} required>
+          <option value="">Select State</option>
           <option value="TX">TX</option>
           <option value="CA">CA</option>
           <option value="NY">NY</option>
-          <option value="FL">FL</option>
-          <option value="AZ">AZ</option>
         </select>
       </label>
-      <br />
-
       <label>
-        Zip Code:
-        <input
-          type="text"
-          name="zip"
-          value={formData.zip}
-          pattern="[0-9]{5,9}"
-          required
-          onChange={handleChange}
-        />
+        Zipcode:
+        <input name="zipcode" value={formData.zipcode} onChange={handleChange} required />
       </label>
-      <br />
-
       <label>
         Skills:
-        <select
-          name="skills"
-          multiple
-          value={formData.skills}
-          onChange={handleSkillsChange}
-          required
-        >
+        <select multiple name="skills" value={formData.skills} onChange={handleSkillsChange}>
           <option value="team work">Team Work</option>
           <option value="driving">Driving</option>
           <option value="photography">Photography</option>
-          <option value="gardening">Gardening</option>
-          <option value="leadership">Leadership</option>
-          <option value="public speaking">Public Speaking</option>
         </select>
       </label>
-      <br />
-
       <label>
         Preferences:
-        <textarea
-          name="preferences"
-          value={formData.preferences}
-          onChange={handleChange}
-        />
+        <textarea name="preferences" value={formData.preferences} onChange={handleChange} />
       </label>
-      <br />
-
       <label>
-        Availability (Select multiple dates):
+        Availability:
         <input type="date" onChange={handleAddDate} />
       </label>
-
-      <div className="selected-dates">
-        {formData.availability.length > 0 ? (
-          <ul>
-            {formData.availability.map((date, index) => (
-              <li key={index}>
-                {date}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDate(date)}
-                >
-                  x
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No dates selected yet.</p>
-        )}
-      </div>
-      <br />
-
+      <ul>
+        {formData.availability.map((date) => (
+          <li key={date}>
+            {date} <button type="button" onClick={() => handleRemoveDate(date)}>x</button>
+          </li>
+        ))}
+      </ul>
       <button type="submit">Save Profile</button>
     </form>
   );
 }
-
-export default VolunteerProfile;
